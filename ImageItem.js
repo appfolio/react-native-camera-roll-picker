@@ -3,7 +3,10 @@ import {
   Image,
   StyleSheet,
   Dimensions,
+  Platform,
+  TouchableNativeFeedback,
   TouchableOpacity,
+  View,
 } from 'react-native';
 
 class ImageItem extends Component {
@@ -32,21 +35,42 @@ class ImageItem extends Component {
 
     var image = item.node.image;
 
-    return (
-      <TouchableOpacity
-        style={{marginBottom: imageMargin, marginRight: imageMargin}}
-        onPress={() => this._handleClick(image)}>
-        <Image
-          source={{uri: image.uri}}
-          style={{height: this._imageSize, width: this._imageSize}} >
-          { (selected) ? marker : null }
-        </Image>
-      </TouchableOpacity>
-    );
+    if (Platform.OS === 'android') {
+      return (
+        <TouchableNativeFeedback
+          style={{marginBottom: imageMargin, marginRight: imageMargin}}
+          onPress={() => this._handleClick(image)}
+          background={TouchableNativeFeedback.Ripple('#fff')}
+          useForeground={true}
+          >
+          <View>
+            <Image
+              source={{uri: image.uri}}
+              style={{height: this._imageSize, width: this._imageSize}} >
+              { (selected) ? marker : null }
+            </Image>
+          </View>
+        </TouchableNativeFeedback>
+      )
+    } else {
+      return (
+        <TouchableOpacity
+          style={{marginBottom: imageMargin, marginRight: imageMargin}}
+          onPress={() => this._handleClick(image)}>
+          <Image
+            source={{uri: image.uri}}
+            style={{height: this._imageSize, width: this._imageSize}} >
+            { (selected) ? marker : null }
+          </Image>
+        </TouchableOpacity>
+      );
+    }
   }
 
   _handleClick(item) {
-    this.props.onClick(item);
+    window.requestAnimationFrame(() => {
+      this.props.onClick(item);
+    });
   }
 }
 
